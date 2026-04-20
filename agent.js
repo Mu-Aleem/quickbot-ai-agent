@@ -1,41 +1,50 @@
 // Agent Loop — The brain of QuickBot
-// Extracted so both CLI (index.js) and Web (server.js) can use it
+// Supports two providers: "ollama" (local, slow) or "groq" (cloud, fast & free)
 
 import { tools } from "./tools.js";
 import { executeTool } from "./executor.js";
 
+// ============================================================
+// PROVIDER CONFIG — switch between Ollama and Groq
+// ============================================================
+const PROVIDER = (process.env.PROVIDER || "ollama").toLowerCase();
+
+// Ollama config
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://localhost:11434";
-const MODEL = process.env.OLLAMA_MODEL || "llama3.2:1b";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:3b";
+
+// Groq config
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+// Which model name to display in UI
+export const MODEL = PROVIDER === "groq" ? GROQ_MODEL : OLLAMA_MODEL;
+
 const MAX_STEPS = 10;
 
-const SYSTEM_PROMPT = `You are QuickBot, a helpful AI assistant.
+const SYSTEM_PROMPT = `You are QuickBot, a helpful AI assistant with tools.
+Use tools for math, weather, web search, notes, and current date/time.
+Be concise. For questions you can answer from knowledge, respond directly without tools.`;
 
-You have access to these tools:
-- calculate: For math calculations and unit conversions
-- get_weather: To check weather in any city
-- web_search: To search the internet for current information
-- save_note: To save notes locally for the user
-- read_notes: To read and search through saved notes
-- get_current_datetime: To get the current date and time
-
-## Rules:
-- Use tools whenever the user's question needs real data (weather, calculations, current info)
-- Think step by step for complex requests — you can call multiple tools in sequence
-- If a tool fails, explain the error and suggest alternatives
-- Be concise but helpful in your responses
-- When saving notes, use a clear title that makes it easy to find later
-- For questions you can answer from your own knowledge, respond directly without tools`;
-
-// Call Ollama API
+// ============================================================
+// OLLAMA API CALL
+// ============================================================
 async function callOllama(messages) {
   const res = await fetch(`${OLLAMA_URL}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: MODEL,
+      model: OLLAMA_MODEL,
       messages,
       tools,
       stream: false,
+      keep_alive: "10m",
+      options: {
+        num_predict: 512,
+        temperature: 0.3,
+        num_ctx: 4096,
+      },
     }),
   });
 
@@ -44,33 +53,153 @@ async function callOllama(messages) {
     throw new Error(`Ollama error (${res.status}): ${text}`);
   }
 
-  return res.json();
+  const data = await res.json();
+  return data.message; // { role, content, tool_calls }
 }
 
-// Check if Ollama is running and model is available
+// ============================================================
+// GROQ API CALL (OpenAI-compatible)
+// ============================================================
+async function callGroq(messages, { allowTools = true } = {}) {
+  if (!GROQ_API_KEY || GROQ_API_KEY === "your_groq_api_key_here") {
+    throw new Error("GROQ_API_KEY not set. Get one free at console.groq.com and add it to .env");
+  }
+
+  const body = {
+    model: GROQ_MODEL,
+    messages,
+    temperature: 0.3,
+    max_tokens: 1024,
+    stream: false,
+  };
+
+  if (allowTools) {
+    body.tools = tools;
+  }
+
+  const res = await fetch(GROQ_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${GROQ_API_KEY}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    const err = errData.error || {};
+
+    // Log full error to server console
+    console.error("Groq API error:", JSON.stringify(errData, null, 2));
+
+    // Graceful fallback: if tool call generation failed, retry WITHOUT tools
+    // This lets the model just answer directly from its knowledge
+    if (
+      allowTools &&
+      (err.code === "tool_use_failed" ||
+        err.message?.includes("Failed to call a function"))
+    ) {
+      console.log("⚠️  Tool call failed — retrying without tools...");
+      return callGroq(messages, { allowTools: false });
+    }
+
+    const details = err.failed_generation
+      ? ` | Raw output: ${String(err.failed_generation).substring(0, 150)}`
+      : "";
+
+    throw new Error(`Groq error (${res.status}): ${err.message || "unknown"}${details}`);
+  }
+
+  const data = await res.json();
+  return data.choices[0].message;
+}
+
+// ============================================================
+// UNIFIED CALL — picks provider based on env
+// ============================================================
+async function callModel(messages) {
+  if (PROVIDER === "groq") return callGroq(messages);
+  return callOllama(messages);
+}
+
+// ============================================================
+// CHECK PROVIDER STATUS
+// ============================================================
 export async function checkOllama() {
+  // Groq check
+  if (PROVIDER === "groq") {
+    if (!GROQ_API_KEY || GROQ_API_KEY === "your_groq_api_key_here") {
+      return {
+        connected: false,
+        hasModel: false,
+        model: GROQ_MODEL,
+        provider: "groq",
+        error: "GROQ_API_KEY not set in .env",
+      };
+    }
+
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/models", {
+        headers: { Authorization: `Bearer ${GROQ_API_KEY}` },
+      });
+      if (!res.ok) {
+        return {
+          connected: false,
+          hasModel: false,
+          model: GROQ_MODEL,
+          provider: "groq",
+          error: "Invalid GROQ_API_KEY or Groq API unreachable",
+        };
+      }
+      return {
+        connected: true,
+        hasModel: true,
+        model: GROQ_MODEL,
+        provider: "groq",
+      };
+    } catch {
+      return {
+        connected: false,
+        hasModel: false,
+        model: GROQ_MODEL,
+        provider: "groq",
+        error: "Cannot reach Groq API (check internet)",
+      };
+    }
+  }
+
+  // Ollama check
   try {
     const res = await fetch(`${OLLAMA_URL}/api/tags`);
     if (!res.ok) throw new Error();
     const data = await res.json();
     const modelNames = data.models.map((m) => m.name);
-    const hasModel = modelNames.some((n) => n.startsWith(MODEL.split(":")[0]));
+    const hasModel = modelNames.some((n) => n.startsWith(OLLAMA_MODEL.split(":")[0]));
     return {
       connected: true,
       hasModel,
-      model: MODEL,
+      model: OLLAMA_MODEL,
+      provider: "ollama",
       availableModels: modelNames,
     };
   } catch {
-    return { connected: false, hasModel: false, model: MODEL, availableModels: [] };
+    return {
+      connected: false,
+      hasModel: false,
+      model: OLLAMA_MODEL,
+      provider: "ollama",
+      availableModels: [],
+    };
   }
 }
 
-// The Agent Loop
-// Takes conversation messages, returns { response, steps, toolCalls }
+// ============================================================
+// THE AGENT LOOP
+// ============================================================
 export async function runAgent(conversationMessages) {
   const messages = [...conversationMessages];
-  const toolCalls = []; // track all tool calls for the UI
+  const toolCalls = [];
   let steps = 0;
 
   while (steps < MAX_STEPS) {
@@ -81,8 +210,7 @@ export async function runAgent(conversationMessages) {
       ...messages,
     ];
 
-    const response = await callOllama(chatMessages);
-    const assistantMsg = response.message;
+    const assistantMsg = await callModel(chatMessages);
 
     // CASE 1: Model wants to call tool(s)
     if (assistantMsg.tool_calls && assistantMsg.tool_calls.length > 0) {
@@ -92,7 +220,6 @@ export async function runAgent(conversationMessages) {
         const funcName = toolCall.function.name;
         let funcArgs = toolCall.function.arguments;
 
-        // Small models sometimes return args in weird formats
         if (typeof funcArgs === "string") {
           try {
             funcArgs = JSON.parse(funcArgs);
@@ -101,10 +228,8 @@ export async function runAgent(conversationMessages) {
           }
         }
 
-        // Small models sometimes put the value directly instead of {expression: "..."}
-        // e.g. calculate gets {type: "number", value: "3"} instead of {expression: "15*2.5"}
+        // Defensive fallbacks for small models that mess up arg names
         if (funcName === "calculate" && !funcArgs.expression) {
-          // Try to extract anything usable
           const val = funcArgs.value || funcArgs.query || funcArgs.input || Object.values(funcArgs).find(v => typeof v === "string");
           if (val) funcArgs = { expression: String(val) };
         }
@@ -123,7 +248,6 @@ export async function runAgent(conversationMessages) {
 
         const parsed = JSON.parse(result);
 
-        // Track for UI
         toolCalls.push({
           step: steps,
           tool: funcName,
@@ -133,11 +257,16 @@ export async function runAgent(conversationMessages) {
           duration,
         });
 
-        // Send result back to model
-        messages.push({ role: "tool", content: result });
+        // Send tool result back to model
+        // Groq (OpenAI format) requires tool_call_id
+        messages.push({
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: result,
+        });
       }
 
-      // CASE 2: Model is done — final text response
+      // CASE 2: Model is done
     } else {
       const finalText = assistantMsg.content || "Done.";
       return { response: finalText, steps, toolCalls };
@@ -151,4 +280,4 @@ export async function runAgent(conversationMessages) {
   };
 }
 
-export { MODEL };
+export { PROVIDER };

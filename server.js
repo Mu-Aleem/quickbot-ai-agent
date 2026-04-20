@@ -5,7 +5,7 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { runAgent, checkOllama, MODEL } from "./agent.js";
+import { runAgent, checkOllama, MODEL, PROVIDER } from "./agent.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -74,8 +74,13 @@ async function start() {
   const status = await checkOllama();
 
   if (!status.connected) {
-    console.log("❌ Cannot connect to Ollama. Make sure it's running:");
-    console.log("   ollama serve\n");
+    if (PROVIDER === "groq") {
+      console.log(`❌ Groq: ${status.error || "Cannot connect"}`);
+      console.log("   Get a free API key at console.groq.com and add to .env\n");
+    } else {
+      console.log("❌ Cannot connect to Ollama. Make sure it's running:");
+      console.log("   ollama serve\n");
+    }
     process.exit(1);
   }
 
@@ -88,8 +93,9 @@ async function start() {
 
   app.listen(PORT, () => {
     console.log(`\n🤖 QuickBot Server running!`);
-    console.log(`   Model: ${MODEL}`);
-    console.log(`   URL:   http://localhost:${PORT}\n`);
+    console.log(`   Provider: ${PROVIDER.toUpperCase()}`);
+    console.log(`   Model:    ${MODEL}`);
+    console.log(`   URL:      http://localhost:${PORT}\n`);
   });
 }
 

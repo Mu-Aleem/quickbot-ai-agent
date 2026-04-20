@@ -104,54 +104,195 @@
 
     /* Welcome screen */
     .welcome {
-      text-align: center;
       margin: auto;
-      max-width: 500px;
+      max-width: 720px;
+      width: 100%;
     }
 
-    .welcome-icon { font-size: 3rem; margin-bottom: 16px; }
+    .welcome-hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
 
-    .welcome h2 {
-      font-size: 1.5rem;
-      margin-bottom: 8px;
+    .welcome-icon {
+      font-size: 3.5rem;
+      margin-bottom: 14px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .welcome-hero h2 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
       color: var(--text);
+      font-weight: 700;
     }
 
-    .welcome p {
+    .welcome-hero h2 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-hero p {
       color: var(--text-muted);
-      margin-bottom: 24px;
       line-height: 1.6;
+      font-size: 0.95rem;
+      max-width: 480px;
+      margin: 0 auto;
     }
 
-    .suggestions {
+    /* Tools grid */
+    .tools-section {
+      margin-bottom: 28px;
+    }
+
+    .section-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .tools-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
     }
 
-    .suggestion {
+    .tool-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 12px 16px;
-      text-align: left;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      cursor: pointer;
+      padding: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
       transition: all 0.2s;
     }
 
-    .suggestion:hover {
-      border-color: var(--accent);
-      color: var(--text);
+    .tool-card:hover {
+      border-color: rgba(88, 166, 255, 0.3);
+      transform: translateY(-2px);
     }
 
-    .suggestion strong {
-      display: block;
+    .tool-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .tool-card-icon.blue { background: rgba(88, 166, 255, 0.15); }
+    .tool-card-icon.green { background: rgba(63, 185, 80, 0.15); }
+    .tool-card-icon.purple { background: rgba(188, 140, 255, 0.15); }
+    .tool-card-icon.orange { background: rgba(240, 136, 62, 0.15); }
+    .tool-card-icon.red { background: rgba(248, 81, 73, 0.15); }
+    .tool-card-icon.yellow { background: rgba(210, 153, 34, 0.15); }
+
+    .tool-card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tool-card-name {
       color: var(--text);
-      font-size: 0.8rem;
+      font-weight: 600;
+      font-size: 0.82rem;
+      margin-bottom: 2px;
+    }
+
+    .tool-card-desc {
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      line-height: 1.4;
+    }
+
+    /* Info grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .info-card-value {
+      color: var(--accent);
+      font-size: 1.2rem;
+      font-weight: 700;
+      font-family: 'Cascadia Code', monospace;
       margin-bottom: 4px;
     }
+
+    .info-card-label {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* How it works steps */
+    .how-it-works {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+
+    .how-it-works-title {
+      color: var(--accent-purple);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .how-it-works-steps {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .how-step {
+      padding: 4px 10px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Cascadia Code', monospace;
+      font-size: 0.76rem;
+    }
+
+    .how-step.accent { color: var(--accent); border-color: rgba(88,166,255,0.3); }
+    .how-step.green { color: var(--accent-green); border-color: rgba(63,185,80,0.3); }
+    .how-step.purple { color: var(--accent-purple); border-color: rgba(188,140,255,0.3); }
+    .how-step.orange { color: var(--accent-orange); border-color: rgba(240,136,62,0.3); }
+
+    .how-arrow { color: var(--text-muted); }
 
     /* Messages */
     .message {
@@ -215,49 +356,83 @@
     }
 
     .tool-call {
-      background: rgba(188, 140, 255, 0.06);
-      border: 1px solid rgba(188, 140, 255, 0.15);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 10px 14px;
       margin-bottom: 6px;
-      font-size: 0.82rem;
+      transition: all 0.2s;
+    }
+
+    .tool-call:hover {
+      border-color: rgba(88, 166, 255, 0.3);
+    }
+
+    .tool-call.errored {
+      background: rgba(248, 81, 73, 0.04);
+      border-color: rgba(248, 81, 73, 0.2);
     }
 
     .tool-call-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
     }
 
     .tool-call-icon {
-      font-size: 0.9rem;
+      font-size: 1rem;
+      flex-shrink: 0;
     }
 
-    .tool-call-name {
-      color: var(--accent-purple);
+    .tool-call-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .tool-call-label {
+      color: var(--text);
       font-weight: 600;
-      font-family: 'Cascadia Code', 'Fira Code', monospace;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
+      flex-shrink: 0;
     }
 
-    .tool-call-status {
-      margin-left: auto;
-      font-size: 0.75rem;
+    .tool-call-summary {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .tool-call-status.success { color: var(--accent-green); }
-    .tool-call-status.error { color: var(--accent-red); }
+    .tool-call.errored .tool-call-label { color: var(--accent-red); }
 
     .tool-call-duration {
+      color: #484f58;
+      font-size: 0.7rem;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      flex-shrink: 0;
+    }
+
+    .tool-call-chevron {
       color: var(--text-muted);
-      font-size: 0.72rem;
+      font-size: 0.65rem;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .tool-call.expanded .tool-call-chevron {
+      transform: rotate(90deg);
     }
 
     .tool-call-details {
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(188, 140, 255, 0.1);
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
       display: none;
     }
 
@@ -266,33 +441,26 @@
     }
 
     .tool-call-detail-label {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
       margin-bottom: 4px;
+      font-weight: 600;
     }
 
     .tool-call-detail-value {
       font-family: 'Cascadia Code', 'Fira Code', monospace;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--text-muted);
       background: var(--bg);
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       white-space: pre-wrap;
-      word-break: break-all;
-    }
-
-    .tool-call-chevron {
-      color: var(--text-muted);
-      font-size: 0.7rem;
-      transition: transform 0.2s;
-    }
-
-    .tool-call.expanded .tool-call-chevron {
-      transform: rotate(90deg);
+      word-break: break-word;
+      max-height: 200px;
+      overflow-y: auto;
     }
 
     /* Loading */
@@ -502,10 +670,15 @@
     ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
     @media (max-width: 600px) {
-      .suggestions { grid-template-columns: 1fr; }
+      .tools-grid { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .info-card { padding: 10px; }
+      .info-card-value { font-size: 1rem; }
       .header { padding: 12px 16px; }
       .chat-container { padding: 16px; }
       .input-area { padding: 12px 16px; }
+      .welcome-hero h2 { font-size: 1.4rem; }
+      .how-it-works-steps { font-size: 0.72rem; }
     }
   </style>
 </head>
@@ -539,27 +712,90 @@
   <div class="chat-container" id="chatContainer">
     <!-- Welcome screen -->
     <div class="welcome" id="welcomeScreen">
-      <div class="welcome-icon">&#x1F916;</div>
-      <h2>Hey! I'm QuickBot</h2>
-      <p>I'm an AI agent with tools. I can do math, check weather, search the web, and save notes for you. Try asking me something!</p>
-      <div class="suggestions">
-        <div class="suggestion" onclick="sendSuggestion(this)">
-          <strong>&#x1F321;&#xFE0F; Weather</strong>
-          What's the weather in Lahore?
+
+      <div class="welcome-hero">
+        <div class="welcome-icon">&#x1F916;</div>
+        <h2>Hey! I'm Quick<span>Bot</span></h2>
+        <p>A learning project exploring AI Agents and Tool Use. I use the <strong style="color:var(--text)">ReAct</strong> pattern &mdash; I think, call tools, observe results, and keep going until the task is done.</p>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-value">6</div>
+          <div class="info-card-label">Tools Available</div>
         </div>
-        <div class="suggestion" onclick="sendSuggestion(this)">
-          <strong>&#x1F522; Calculate</strong>
-          What is 15% tip on a bill of 2500?
+        <div class="info-card">
+          <div class="info-card-value">&lt;2s</div>
+          <div class="info-card-label">Response Time</div>
         </div>
-        <div class="suggestion" onclick="sendSuggestion(this)">
-          <strong>&#x1F4DD; Save Note</strong>
-          Save a note: buy milk, eggs, and bread
-        </div>
-        <div class="suggestion" onclick="sendSuggestion(this)">
-          <strong>&#x1F4C5; Date & Time</strong>
-          What's the current date and time?
+        <div class="info-card">
+          <div class="info-card-value">10</div>
+          <div class="info-card-label">Max Agent Steps</div>
         </div>
       </div>
+
+      <div class="tools-section">
+        <div class="section-title">Available Tools</div>
+        <div class="tools-grid">
+          <div class="tool-card">
+            <div class="tool-card-icon blue">&#x1F522;</div>
+            <div class="tool-card-content">
+              <div class="tool-card-name">Calculate</div>
+              <div class="tool-card-desc">Math, percentages, unit conversions</div>
+            </div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-icon orange">&#x1F321;&#xFE0F;</div>
+            <div class="tool-card-content">
+              <div class="tool-card-name">Weather</div>
+              <div class="tool-card-desc">Real-time weather for any city</div>
+            </div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-icon green">&#x1F50D;</div>
+            <div class="tool-card-content">
+              <div class="tool-card-name">Web Search</div>
+              <div class="tool-card-desc">Search the internet for current info</div>
+            </div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-icon purple">&#x1F4DD;</div>
+            <div class="tool-card-content">
+              <div class="tool-card-name">Save Note</div>
+              <div class="tool-card-desc">Store notes locally in JSON</div>
+            </div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-icon yellow">&#x1F4D6;</div>
+            <div class="tool-card-content">
+              <div class="tool-card-name">Read Notes</div>
+              <div class="tool-card-desc">View or search saved notes</div>
+            </div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-icon red">&#x1F4C5;</div>
+            <div class="tool-card-content">
+              <div class="tool-card-name">Date &amp; Time</div>
+              <div class="tool-card-desc">Current date, time, timezone</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="how-it-works">
+        <div class="how-it-works-title">&#x1F9E0; How the Agent Loop Works</div>
+        <div class="how-it-works-steps">
+          <span class="how-step accent">THINK</span>
+          <span class="how-arrow">&rarr;</span>
+          <span class="how-step green">CALL TOOL</span>
+          <span class="how-arrow">&rarr;</span>
+          <span class="how-step purple">OBSERVE</span>
+          <span class="how-arrow">&rarr;</span>
+          <span class="how-step orange">RESPOND</span>
+          <span style="color:var(--text-muted);font-size:0.76rem;margin-left:8px;">(repeat until done)</span>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -602,10 +838,17 @@
 
         if (!data.connected) {
           dot.className = "status-dot offline";
-          modelEl.textContent = "Ollama offline";
-          document.getElementById("errorTitle").textContent = "Cannot Connect to Ollama";
-          document.getElementById("errorDesc").textContent = "Make sure Ollama is running:";
-          document.getElementById("errorCode").textContent = "ollama serve";
+          if (data.provider === "groq") {
+            modelEl.textContent = "Groq error";
+            document.getElementById("errorTitle").textContent = "Groq Not Connected";
+            document.getElementById("errorDesc").textContent = data.error || "Add your API key:";
+            document.getElementById("errorCode").textContent = "GROQ_API_KEY=gsk_... in .env";
+          } else {
+            modelEl.textContent = "Ollama offline";
+            document.getElementById("errorTitle").textContent = "Cannot Connect to Ollama";
+            document.getElementById("errorDesc").textContent = "Make sure Ollama is running:";
+            document.getElementById("errorCode").textContent = "ollama serve";
+          }
           connectionError.style.display = "flex";
           return;
         }
@@ -665,6 +908,7 @@
         });
 
         // Remove loading
+        clearInterval(loadingEl.dataset.timer);
         loadingEl.remove();
 
         if (!res.ok) {
@@ -684,6 +928,7 @@
         addMessage("assistant", data.response);
 
       } catch (err) {
+        clearInterval(loadingEl.dataset.timer);
         loadingEl.remove();
         showError(err.message);
       } finally {
@@ -713,6 +958,88 @@
       scrollToBottom();
     }
 
+    // ===== FRIENDLY TOOL SUMMARIES =====
+    // Convert raw tool input/output into a human-readable one-liner
+    function getToolSummary(tc) {
+      const { tool, input, output, error } = tc;
+
+      // Error case
+      if (error) {
+        return {
+          icon: "&#x26A0;&#xFE0F;",
+          label: toolLabels[tool] || tool,
+          summary: output.error || "Tool failed",
+        };
+      }
+
+      // Per-tool friendly summary
+      switch (tool) {
+        case "calculate":
+          return {
+            icon: "&#x1F522;",
+            label: "Calculated",
+            summary: `${input.expression || "expression"} = ${output.result}`,
+          };
+
+        case "get_weather":
+          return {
+            icon: "&#x1F321;&#xFE0F;",
+            label: "Checked weather",
+            summary: output.city
+              ? `${output.city}: ${Math.round(output.temp)}°C, ${output.description || output.condition || ""}`
+              : `for ${input.city}`,
+          };
+
+        case "web_search":
+          const count = output.results?.length || 0;
+          return {
+            icon: "&#x1F50D;",
+            label: "Searched web",
+            summary: `"${input.query}" — found ${count} result${count === 1 ? "" : "s"}`,
+          };
+
+        case "save_note":
+          return {
+            icon: "&#x1F4DD;",
+            label: "Saved note",
+            summary: `"${input.title || output.note?.title || "Untitled"}"`,
+          };
+
+        case "read_notes":
+          const noteCount = output.notes?.length || 0;
+          return {
+            icon: "&#x1F4D6;",
+            label: "Read notes",
+            summary: input.search
+              ? `searching "${input.search}" — ${noteCount} found`
+              : `${noteCount} note${noteCount === 1 ? "" : "s"} found`,
+          };
+
+        case "get_current_datetime":
+          return {
+            icon: "&#x1F4C5;",
+            label: "Got date/time",
+            summary: output.date || "",
+          };
+
+        default:
+          return {
+            icon: "&#x1F527;",
+            label: tool,
+            summary: "completed",
+          };
+      }
+    }
+
+    const toolLabels = {
+      calculate: "Calculation",
+      get_weather: "Weather",
+      web_search: "Web Search",
+      save_note: "Save Note",
+      read_notes: "Read Notes",
+      get_current_datetime: "Date/Time",
+    };
+
     // ===== ADD TOOL CALLS =====
     function addToolCalls(toolCalls) {
       const wrapper = document.createElement("div");
@@ -721,21 +1048,25 @@
       let toolsHtml = '<div class="tool-calls">';
 
       for (const tc of toolCalls) {
+        const summary = getToolSummary(tc);
         const statusClass = tc.error ? "error" : "success";
-        const statusText = tc.error ? "&#x274C; Failed" : "&#x2705; Success";
         const inputStr = JSON.stringify(tc.input, null, 2);
         const outputStr = JSON.stringify(tc.output, null, 2);
 
         toolsHtml += `
-          <div class="tool-call" onclick="this.classList.toggle('expanded')">
+          <div class="tool-call ${tc.error ? "errored" : ""}" onclick="this.classList.toggle('expanded')">
             <div class="tool-call-header">
-              <span class="tool-call-icon">&#x1F527;</span>
-              <span class="tool-call-name">${tc.tool}()</span>
-              <span class="tool-call-status ${statusClass}">${statusText}</span>
+              <span class="tool-call-icon">${summary.icon}</span>
+              <div class="tool-call-text">
+                <span class="tool-call-label">${summary.label}</span>
+                <span class="tool-call-summary">${escapeHtml(summary.summary)}</span>
+              </div>
               <span class="tool-call-duration">${tc.duration}ms</span>
               <span class="tool-call-chevron">&#x25B6;</span>
             </div>
             <div class="tool-call-details">
+              <div class="tool-call-detail-label">Function</div>
+              <div class="tool-call-detail-value">${tc.tool}()</div>
               <div class="tool-call-detail-label">Input</div>
               <div class="tool-call-detail-value">${escapeHtml(inputStr)}</div>
               <div class="tool-call-detail-label">Output</div>
@@ -768,12 +1099,33 @@
           </div>
           <div class="loading-text">
             <div class="loading-spinner"></div>
-            Thinking...
+            <span id="loadingText">Thinking...</span>
+            <span id="loadingTimer" style="color:var(--text-muted);font-size:0.75rem;margin-left:6px;">0s</span>
           </div>
         </div>
       `;
       chatContainer.appendChild(div);
       scrollToBottom();
+
+      // Show elapsed time + helpful messages
+      const startTime = Date.now();
+      const timerEl = div.querySelector("#loadingTimer");
+      const textEl = div.querySelector("#loadingText");
+      const messages = [
+        { after: 0, text: "Thinking..." },
+        { after: 10, text: "Processing..." },
+        { after: 20, text: "Model is working on it..." },
+        { after: 40, text: "Still thinking (local models are slower)..." },
+        { after: 60, text: "Almost there..." },
+      ];
+
+      div.dataset.timer = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        timerEl.textContent = `${elapsed}s`;
+        const msg = [...messages].reverse().find(m => elapsed >= m.after);
+        if (msg) textEl.textContent = msg.text;
+      }, 500);
+
       return div;
     }
 
@@ -808,47 +1160,12 @@
 
     // ===== CLEAR CHAT =====
     function clearChat() {
-      chatContainer.innerHTML = "";
-
-      // Re-add welcome screen
-      chatContainer.innerHTML = `
-        <div class="welcome" id="welcomeScreen">
-          <div class="welcome-icon">&#x1F916;</div>
-          <h2>Hey! I'm QuickBot</h2>
-          <p>I'm an AI agent with tools. I can do math, check weather, search the web, and save notes for you. Try asking me something!</p>
-          <div class="suggestions">
-            <div class="suggestion" onclick="sendSuggestion(this)">
-              <strong>&#x1F321;&#xFE0F; Weather</strong>
-              What's the weather in Lahore?
-            </div>
-            <div class="suggestion" onclick="sendSuggestion(this)">
-              <strong>&#x1F522; Calculate</strong>
-              What is 15% tip on a bill of 2500?
-            </div>
-            <div class="suggestion" onclick="sendSuggestion(this)">
-              <strong>&#x1F4DD; Save Note</strong>
-              Save a note: buy milk, eggs, and bread
-            </div>
-            <div class="suggestion" onclick="sendSuggestion(this)">
-              <strong>&#x1F4C5; Date & Time</strong>
-              What's the current date and time?
-            </div>
-          </div>
-        </div>
-      `;
-
-      // Reset conversation
+      // Reload the page is cleanest — re-creates welcome screen
       if (conversationId) {
         fetch(`/api/conversation/${conversationId}`, { method: "DELETE" });
       }
       conversationId = null;
-    }
-
-    // ===== SUGGESTION CLICK =====
-    function sendSuggestion(el) {
-      const text = el.textContent.replace(el.querySelector("strong").textContent, "").trim();
-      messageInput.value = text;
-      sendMessage();
+      location.reload();
     }
 
     // ===== HELPERS =====

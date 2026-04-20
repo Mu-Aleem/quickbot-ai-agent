@@ -45,17 +45,13 @@ export const tools = [
     function: {
       name: "web_search",
       description:
-        "Search the web for current information. Use when the user asks about recent events, facts you are unsure about, or anything that needs up-to-date data.",
+        "Search the web for current information. Use when the user asks about recent events, facts you are unsure about, or anything that needs up-to-date data. Do NOT use for personal questions about the user.",
       parameters: {
         type: "object",
         properties: {
           query: {
             type: "string",
             description: "The search query",
-          },
-          max_results: {
-            type: "number",
-            description: "Maximum number of results to return (default 5)",
           },
         },
         required: ["query"],
