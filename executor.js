@@ -18,20 +18,24 @@ const toolFunctions = {
   // --- CALCULATOR ---
   calculate: async ({ expression }) => {
     try {
-      // Clean up common issues from small models:
-      // Remove curly braces, "calculate", extra quotes, etc.
       let cleaned = String(expression)
-        .replace(/[{}]/g, "")          // {15 * 2.5} → 15 * 2.5
-        .replace(/^["']+|["']+$/g, "") // strip wrapping quotes
-        .replace(/×/g, "*")            // × → *
-        .replace(/÷/g, "/")            // ÷ → /
-        .replace(/%\s*of\s*/gi, "/100*") // 15% of 2500 → 15/100*2500
-        .replace(/(\d)%/g, "($1/100)") // 15% → (15/100)
+        .replace(/[{}]/g, "")
+        .replace(/^["']+|["']+$/g, "")
+        .replace(/×/g, "*")
+        .replace(/÷/g, "/")
+        .replace(/%\s*of\s*/gi, "/100*")
+        .replace(/(\d)%/g, "($1/100)")
         .trim();
+
+      // Whitelist: only digits, math operators, parens, dot, space.
+      // Blocks identifiers, strings, and any JS syntax outside arithmetic.
+      if (!/^[\d+\-*/().\s]+$/.test(cleaned)) {
+        return { error: `Invalid expression: "${expression}"` };
+      }
 
       const result = Function('"use strict"; return (' + cleaned + ")")();
 
-      if (typeof result !== "number" || isNaN(result)) {
+      if (typeof result !== "number" || !isFinite(result)) {
         return { error: `Could not calculate: "${expression}"` };
       }
 
@@ -132,7 +136,7 @@ const toolFunctions = {
     try {
       const notes = JSON.parse(fs.readFileSync(NOTES_FILE, "utf8"));
       const note = {
-        id: notes.length + 1,
+        id: crypto.randomUUID(),
         title,
         content,
         created_at: new Date().toISOString(),

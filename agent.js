@@ -126,7 +126,7 @@ async function callModel(messages) {
 // ============================================================
 // CHECK PROVIDER STATUS
 // ============================================================
-export async function checkOllama() {
+export async function checkProvider() {
   // Groq check
   if (PROVIDER === "groq") {
     if (!GROQ_API_KEY || GROQ_API_KEY === "your_groq_api_key_here") {

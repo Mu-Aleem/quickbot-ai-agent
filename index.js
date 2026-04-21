@@ -3,7 +3,7 @@
 
 import "dotenv/config";
 import readline from "readline";
-import { runAgent, checkOllama, MODEL } from "./agent.js";
+import { runAgent, checkProvider, MODEL, PROVIDER } from "./agent.js";
 
 const messages = [];
 
@@ -34,9 +34,19 @@ console.log(`║  Model: ${MODEL.padEnd(31)}║`);
 console.log("║  Type 'exit' to quit                     ║");
 console.log("╚══════════════════════════════════════════╝\n");
 
-const status = await checkOllama();
-if (!status.connected) { console.log("❌ Ollama not running. Run: ollama serve"); process.exit(1); }
-if (!status.hasModel) { console.log(`⚠️ Model "${MODEL}" not found. Run: ollama pull ${MODEL}`); process.exit(1); }
+const status = await checkProvider();
+if (!status.connected) {
+  console.log(PROVIDER === "groq"
+    ? `❌ Groq: ${status.error || "Cannot connect"}. Add GROQ_API_KEY to .env`
+    : "❌ Ollama not running. Run: ollama serve");
+  process.exit(1);
+}
+if (!status.hasModel) {
+  console.log(PROVIDER === "groq"
+    ? `⚠️ Model "${MODEL}" not available on Groq. Check GROQ_MODEL in .env.`
+    : `⚠️ Model "${MODEL}" not found. Run: ollama pull ${MODEL}`);
+  process.exit(1);
+}
 
 function prompt() {
   rl.question("You: ", async (input) => {
