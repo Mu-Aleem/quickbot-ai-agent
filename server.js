@@ -99,9 +99,13 @@ async function start() {
   }
 
   if (!status.hasModel) {
-    console.log(`⚠️  Model "${MODEL}" not found. Pull it first:`);
-    console.log(`   ollama pull ${MODEL}\n`);
-    console.log(`Available models: ${status.availableModels.join(", ")}\n`);
+    if (PROVIDER === "groq") {
+      console.log(`⚠️  Model "${MODEL}" not available on Groq. Check GROQ_MODEL in .env.\n`);
+    } else {
+      console.log(`⚠️  Model "${MODEL}" not found. Pull it first:`);
+      console.log(`   ollama pull ${MODEL}\n`);
+      console.log(`Available models: ${(status.availableModels || []).join(", ")}\n`);
+    }
     process.exit(1);
   }
 
