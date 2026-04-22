@@ -60,7 +60,7 @@ async function callOllama(messages) {
 // ============================================================
 // GROQ API CALL (OpenAI-compatible)
 // ============================================================
-async function callGroq(messages, { allowTools = true } = {}) {
+async function callGroq(messages, { allowTools = true, retries = 0 } = {}) {
   if (!GROQ_API_KEY || GROQ_API_KEY === "your_groq_api_key_here") {
     throw new Error("GROQ_API_KEY not set. Get one free at console.groq.com and add it to .env");
   }
@@ -87,6 +87,23 @@ async function callGroq(messages, { allowTools = true } = {}) {
   });
 
   if (!res.ok) {
+    // Rate limit: wait and retry (Groq returns retry delay in header or message)
+    if (res.status === 429 && retries < 3) {
+      const headerWait = parseFloat(res.headers.get("retry-after"));
+      const errDataForWait = await res.clone().json().catch(() => ({}));
+      const msgWait = errDataForWait.error?.message?.match(/try again in ([\d.]+)(ms|s)/i);
+      let waitMs = 1000;
+      if (!isNaN(headerWait)) {
+        waitMs = headerWait * 1000;
+      } else if (msgWait) {
+        waitMs = msgWait[2].toLowerCase() === "s" ? parseFloat(msgWait[1]) * 1000 : parseFloat(msgWait[1]);
+      }
+      waitMs = Math.min(Math.max(waitMs, 500), 30000);
+      console.log(`⏳ Rate limited — retrying in ${Math.round(waitMs)}ms (attempt ${retries + 1}/3)`);
+      await new Promise((r) => setTimeout(r, waitMs));
+      return callGroq(messages, { allowTools, retries: retries + 1 });
+    }
+
     const errData = await res.json().catch(() => ({}));
     const err = errData.error || {};
 
